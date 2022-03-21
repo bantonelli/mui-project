@@ -102,7 +102,7 @@ const styles = {
     },
 };
 
-const tabRoutes = [
+const routes = [
     '/',
     '/services',
     '/customsoftware',
@@ -113,20 +113,30 @@ const tabRoutes = [
     '/contact'
 ]
 
+const tabRoutes = [
+    '/',
+    '/services',
+    '/revolution',
+    '/about',
+    '/contact'
+]
 
 /**********************
  * MAIN COMPONENT 
  **********************/
 const Header = (props) => {
     // Get active route to determine active tab state
-    const routeMatch = utils.useRouteMatch(tabRoutes);
+    const routeMatch = utils.useRouteMatch(routes)
+    const tabRouteMatch = utils.useRouteMatch(tabRoutes)
     // Get path from routeMatch use -> routeMatch?.pattern?.path
 
     // STATE
-    const [active, setActive] = useState("/");
-    const [anchorEl, setAnchorEl] = useState(null);
-    const [open, setOpen] = useState(false);
-    const [selectedIndex, setSelectedIndex] = useState(0);
+    const [active, setActive] = useState(
+        routeMatch && !tabRouteMatch ? '/services' : tabRouteMatch ? tabRouteMatch?.pattern?.path : false
+    );
+    const [anchorEl, setAnchorEl] = useState(null)
+    const [open, setOpen] = useState(false)
+    const [selectedIndex, setSelectedIndex] = useState(0)
 
     // USEEFFECT
     useEffect(() => {
