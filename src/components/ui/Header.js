@@ -6,6 +6,8 @@ import { useState, useEffect } from 'react'
 import {
     AppBar,
     Button,
+    Menu,
+    MenuItem,
     Tabs,
     Tab,
     Toolbar,
@@ -81,9 +83,26 @@ const styles = {
             backgroundColor: "transparent",
         },
     },
+    menu: {
+        "& .MuiMenu-paper": {
+            backgroundColor: theme.palette.primary.main,
+            color: theme.palette.primary.contrastText,
+            borderRadius: "0px"
+        },
+        "& .MuiMenuItem-root": {
+            ...theme.typography.tab,
+            opacity: 0.7,
+            '&:hover': {
+                opacity: 1
+            }, 
+            '&.selected': {
+                opacity: 1
+            }
+        },
+    },
 };
 
-const routes = [
+const tabRoutes = [
     '/',
     '/services',
     '/customsoftware',
@@ -91,8 +110,7 @@ const routes = [
     '/websites',
     '/revolution',
     '/about',
-    '/contact',
-    '/estimate'
+    '/contact'
 ]
 
 
@@ -101,32 +119,73 @@ const routes = [
  **********************/
 const Header = (props) => {
     // Get active route to determine active tab state
+    const routeMatch = utils.useRouteMatch(tabRoutes);
+    // Get path from routeMatch use -> routeMatch?.pattern?.path
 
-    const routeMatch = utils.useRouteMatch(routes);
+    // STATE
+    const [active, setActive] = useState("/");
+    const [anchorEl, setAnchorEl] = useState(null);
+    const [open, setOpen] = useState(false);
+    const [selectedIndex, setSelectedIndex] = useState(0);
 
-    const [active, setActive] = useState(routeMatch?.pattern?.path)
-
+    // USEEFFECT
     useEffect(() => {
         // console.log("active: ", active);
-        if (
-            window.location.pathname !== "/" &&
-            window.location.pathname !== "/services" &&
-            window.location.pathname !== "/revolution" &&
-            window.location.pathname !== "/about" &&
-            window.location.pathname !== "/contact"
-        ) {
+        if (!routeMatch) {
             setActive(false);
         }
-    }, []);
+    }, [active, routeMatch]);
 
+    // EVENT HANDLERS
     const handleChange = (event, nextPath) => {
-        setActive(nextPath)
-    }
+        setActive(nextPath);
+    };
 
     const homeClick = (event) => {
-        setActive('/')
-    }
+        setActive("/");
+    };
 
+    const handleOpen = (event) => {
+        setAnchorEl(event.currentTarget);
+        setOpen(true);
+    };
+
+    const handleClose = (event) => {
+        setAnchorEl(null);
+        setOpen(false);
+    };
+
+    const handleMenuItemClick = (e, i) => {
+        handleChange(e, "/services");
+        handleClose(e);
+        setSelectedIndex(i);
+    };
+
+    // RENDER HELPERS 
+    const menuOptions = [
+        { text: "Services", link: "/services" },
+        { text: "Custom Software Development", link: "/customsoftware" },
+        { text: "Mobile App Development", link: "/mobileapps" },
+        { text: "Website Development", link: "/websites" },
+    ];
+
+    const menuItems = menuOptions.map(({ text, link }, index) => {
+        return (
+            <MenuItem
+                key={link}
+                className={`${selectedIndex === index ? "selected" : null}`}
+                component={RouterLink}
+                to={`${link}`}
+                onClick={(event) => {
+                    handleMenuItemClick(event, index);
+                }}
+            >
+                {text}
+            </MenuItem>
+        );
+    });
+
+    // RENDER
     return (
         <React.Fragment>
             <ElevationScroll>
@@ -165,6 +224,7 @@ const Header = (props) => {
                                 value="/services"
                                 sx={styles.tab}
                                 label="Services"
+                                onClick={handleOpen}
                                 {...utils.a11yProps("/services")}
                             ></Tab>
                             <Tab
@@ -202,6 +262,25 @@ const Header = (props) => {
                         >
                             Free Estimate
                         </Button>
+                        <Menu
+                            sx={styles.menu}
+                            id="basic-menu"
+                            anchorEl={anchorEl}
+                            open={open}
+                            onClose={handleClose}
+                            elevation={0}
+                            anchorOrigin={{
+                                vertical: "top",
+                                horizontal: "left",
+                            }}
+                            transformOrigin={{
+                                vertical: "top",
+                                horizontal: "left",
+                            }}
+                            MenuListProps={{ onMouseLeave: handleClose }}
+                        >
+                            {menuItems}
+                        </Menu>
                     </Toolbar>
                 </AppBar>
             </ElevationScroll>

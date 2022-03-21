@@ -26,7 +26,9 @@ function a11yProps(index) {
     };
 }
 
-export default {
+const utils = {
     useRouteMatch,
     a11yProps
 }
+
+export default utils
