@@ -1,12 +1,34 @@
 import React from 'react'
 import {
-    AppBar, Toolbar, useScrollTrigger, styled
-} from '@mui/material'
-import theme from './theme'
+    Link as RouterLink,
+} from "react-router-dom";
+import { useState, useEffect } from 'react'
+import {
+    AppBar,
+    Button,
+    Tabs,
+    Tab,
+    Toolbar,
+    styled,
+    useScrollTrigger,
+} from "@mui/material";
+import theme from "./theme"
+import utils from './utilities'
+import logo from "../../assets/logo.svg"
 
-import logo from '../../assets/logo.svg'
 
-function ElevationScroll(props) {
+/**********************
+ * HELPER COMPONENTS 
+ **********************/
+
+const Spacer = styled("div")((thing) => {
+    return thing.theme.mixins.toolbar;
+});
+
+
+const StyledLogo = styled("img")(({ theme }) => heightMixin);
+
+const ElevationScroll = (props) => {
     const { children } = props;
     // Note that you normally won't need to set the window ref as useScrollTrigger
     // will default to window.
@@ -22,53 +44,170 @@ function ElevationScroll(props) {
     });
 }
 
-const Spacer = styled('div')((thing) => {
-    return thing.theme.mixins.toolbar
-})
-
-
-
-// Change keys of toolbar mixin to be 'height' instead of 'minHeight' 
-const heightMixin = Object.fromEntries(    
+/**********************
+ * CONFIG DATA  
+ **********************/
+// Change keys of toolbar mixin to be 'height' instead of 'minHeight'
+const heightMixin = Object.fromEntries(
     Object.entries(theme.mixins.toolbar).map(([key, value]) => {
-            // Modify key here
-            if (typeof(value) === "object") {
-                return [key, {height: value.minHeight}];
-            } else {
-                return ["h" + key.substring(4), value];
-            }
+        // Modify key here
+        if (typeof value === "object") {
+            return [key, { height: value.minHeight }];
+        } else {
+            return ["h" + key.substring(4), value];
         }
-    )
-)
+    })
+);
 
-const StyledLogo = styled('img')(({ theme }) => (heightMixin))
+const styles = {
+    tabContainer: {
+        marginLeft: "auto",
+    },
+    tab: {
+        ...theme.typography.tab,
+        minWidth: 10,
+        marginLeft: "25px",
+    },
+    button: {
+        ...theme.typography.estimate,
+        borderRadius: "50px",
+        marginLeft: "50px",
+        marginRight: "25px",
+        height: "45px",
+    },
+    logoContainer: {
+        padding: 0,
+        "&:hover": {
+            backgroundColor: "transparent",
+        },
+    },
+};
 
-// const Button = (props) => {
-//     return (
-//         <button className={props.className}>{ props.text }</button>
-//     )
-// }
+const routes = [
+    '/',
+    '/services',
+    '/customsoftware',
+    '/mobileapps',
+    '/websites',
+    '/revolution',
+    '/about',
+    '/contact',
+    '/estimate'
+]
 
-// const StyledButton = styled(Button)(({ theme }) => ({
-//     color: 'white',
-//     backgroundColor: theme.palette.primary.main,
-//     height: 50,
-//     width: 200 
-// }))
 
+/**********************
+ * MAIN COMPONENT 
+ **********************/
 const Header = (props) => {
+    // Get active route to determine active tab state
+
+    const routeMatch = utils.useRouteMatch(routes);
+
+    const [active, setActive] = useState(routeMatch?.pattern?.path)
+
+    useEffect(() => {
+        // console.log("active: ", active);
+        if (
+            window.location.pathname !== "/" &&
+            window.location.pathname !== "/services" &&
+            window.location.pathname !== "/revolution" &&
+            window.location.pathname !== "/about" &&
+            window.location.pathname !== "/contact"
+        ) {
+            setActive(false);
+        }
+    }, []);
+
+    const handleChange = (event, nextPath) => {
+        setActive(nextPath)
+    }
+
+    const homeClick = (event) => {
+        setActive('/')
+    }
+
     return (
         <React.Fragment>
             <ElevationScroll>
                 <AppBar position="fixed">
                     <Toolbar disableGutters>
-                        <StyledLogo src={logo} alt="Company Logo"></StyledLogo>
+                        <Button
+                            disableRipple
+                            onClick={homeClick}
+                            sx={styles.logoContainer}
+                            component={RouterLink}
+                            to="/"
+                        >
+                            <StyledLogo
+                                src={logo}
+                                alt="Company Logo"
+                            ></StyledLogo>
+                        </Button>
+                        <Tabs
+                            value={active}
+                            onChange={handleChange}
+                            sx={styles.tabContainer}
+                            textColor="inherit"
+                            indicatorColor="primary"
+                        >
+                            <Tab
+                                component={RouterLink}
+                                to="/"
+                                value="/"
+                                sx={styles.tab}
+                                label="Home"
+                                {...utils.a11yProps("/")}
+                            ></Tab>
+                            <Tab
+                                component={RouterLink}
+                                to="/services"
+                                value="/services"
+                                sx={styles.tab}
+                                label="Services"
+                                {...utils.a11yProps("/services")}
+                            ></Tab>
+                            <Tab
+                                component={RouterLink}
+                                to="/revolution"
+                                value="/revolution"
+                                sx={styles.tab}
+                                label="The Revolution"
+                                {...utils.a11yProps("/revolution")}
+                            ></Tab>
+                            <Tab
+                                component={RouterLink}
+                                to="/about"
+                                value="/about"
+                                sx={styles.tab}
+                                label="About Us"
+                                {...utils.a11yProps("/about")}
+                            ></Tab>
+                            <Tab
+                                component={RouterLink}
+                                to="/contact"
+                                value="/contact"
+                                sx={styles.tab}
+                                label="Contact Us"
+                                {...utils.a11yProps("/contact")}
+                            ></Tab>
+                        </Tabs>
+                        <Button
+                            component={RouterLink}
+                            to="/estimate"
+                            value="/estimate"
+                            color="secondary"
+                            variant="contained"
+                            sx={styles.button}
+                        >
+                            Free Estimate
+                        </Button>
                     </Toolbar>
                 </AppBar>
             </ElevationScroll>
             <Spacer></Spacer>
         </React.Fragment>
     );
-}
+};
 
 export default Header

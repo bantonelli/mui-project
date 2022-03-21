@@ -7,20 +7,36 @@ const theme = createTheme({
     palette: {
         common: {
             blue: `${arcBlue}`,
-            orange: `${arcOrange}`
+            orange: `${arcOrange}`,
         },
         primary: {
-            main: `${arcBlue}`
+            main: `${arcBlue}`,
+            contrastText: "#fff",
         },
         secondary: {
-            main: `${arcOrange}`
-        }
+            main: `${arcOrange}`,
+            contrastText: "#fff",
+        },
     },
     typography: {
-        h3: {
-            fontWeight: 300
-        }
-    }
-})
+        tab: {
+            fontFamily: "Raleway",
+            textTransform: "none",
+            fontWeight: 700,
+            fontSize: "1rem",
+        },
+        estimate: {
+            fontFamily: "Pacifico",
+            fontSize: "1rem",
+            textTransform: "none",
+            color: "white",
+        },
+    },
+    mixins: {
+        toolbar: {
+            minHeight: "7rem",
+        },
+    },
+});
 
 export default theme
